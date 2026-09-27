@@ -194,7 +194,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // --- Bar Chart: Penjualan & Laba 6 Bulan Terakhir ---
         const ctxBar = document.getElementById('dashboardChart').getContext('2d');
-        const chartData = @json($chartData->reverse()->values()); 
+        const chartData = @json($chartData); 
         
         const labelsBar = chartData.map(data => data.month);
         const penjualanData = chartData.map(data => data.penjualan);

@@ -50,6 +50,7 @@
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">Total</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Status</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Jatuh Tempo</th>
+                    <th class="px-4 py-3 text-right font-semibold text-gray-600">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -57,7 +58,14 @@
                 @php $jatuhTempo = $purchase->isJatuhTempo(); @endphp
                 <tr class="transition hover:bg-gray-50 {{ $jatuhTempo ? 'bg-red-50/50' : '' }}">
                     <td class="px-4 py-3 text-gray-600 text-xs">{{ $purchase->tanggal_masuk->format('d/m/Y') }}</td>
-                    <td class="px-4 py-3 font-mono text-xs font-semibold text-gray-800">{{ $purchase->nomor_faktur }}</td>
+                    <td class="px-4 py-3 font-mono text-xs font-semibold text-primary-600">
+                        <a href="{{ route('purchases.receipt', $purchase) }}" class="hover:text-primary-800 hover:underline transition flex items-center gap-1">
+                            {{ $purchase->nomor_faktur }}
+                            @if($purchase->bukti_faktur)
+                                <svg class="h-3 w-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                            @endif
+                        </a>
+                    </td>
                     <td class="px-4 py-3 text-gray-600">{{ $purchase->nama_supplier }}</td>
                     <td class="px-4 py-3 font-medium text-gray-800">{{ $purchase->product->nama_barang }}</td>
                     <td class="px-4 py-3 text-right text-gray-600">{{ $purchase->qty_masuk }}</td>
@@ -76,10 +84,15 @@
                             <span class="block text-red-500">⚠️ Lewat!</span>
                         @endif
                     </td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="{{ route('purchases.receipt', $purchase) }}" class="rounded-lg px-2 py-1 text-xs font-medium text-primary-600 hover:bg-primary-50 transition" title="Lihat Faktur">
+                            Faktur
+                        </a>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" class="px-4 py-12 text-center text-gray-400">Belum ada data pembelian.</td>
+                    <td colspan="10" class="px-4 py-12 text-center text-gray-400">Belum ada data pembelian.</td>
                 </tr>
                 @endforelse
             </tbody>

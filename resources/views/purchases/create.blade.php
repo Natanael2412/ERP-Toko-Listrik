@@ -13,7 +13,7 @@
     </div>
 
     <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <form method="POST" action="{{ route('purchases.store') }}">
+        <form method="POST" action="{{ route('purchases.store') }}" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div class="sm:col-span-2">
@@ -79,6 +79,13 @@
                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 @error('tanggal_jatuh_tempo') border-red-400 @enderror">
                     <p class="mt-1 text-xs text-gray-400">Batas waktu bayar ke supplier</p>
                     @error('tanggal_jatuh_tempo') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="bukti_faktur" class="mb-1.5 block text-sm font-medium text-gray-700">Upload Bukti Faktur / Nota (Opsional)</label>
+                    <input type="file" id="bukti_faktur" name="bukti_faktur" accept="image/jpeg,image/png,image/jpg"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100 focus:border-primary-500 focus:outline-none">
+                    <p class="mt-1 text-xs text-gray-400">Format: JPG, PNG. Maksimal 2MB.</p>
+                    @error('bukti_faktur') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
             </div>
 

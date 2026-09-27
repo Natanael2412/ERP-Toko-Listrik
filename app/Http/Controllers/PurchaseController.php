@@ -63,7 +63,13 @@ class PurchaseController extends Controller
             'harga_beli'          => 'required|numeric|min:0',
             'tanggal_masuk'       => 'required|date',
             'tanggal_jatuh_tempo' => 'required|date|after_or_equal:tanggal_masuk',
+            'bukti_faktur'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        $pathBukti = null;
+        if ($request->hasFile('bukti_faktur')) {
+            $pathBukti = $request->file('bukti_faktur')->store('faktur', 'public');
+        }
 
         DB::beginTransaction();
 
@@ -105,6 +111,7 @@ class PurchaseController extends Controller
                 'tanggal_jatuh_tempo'  => $request->tanggal_jatuh_tempo,
                 'status_bayar'         => 'belum_lunas',
                 'sisa_hutang'          => $totalBeli,
+                'bukti_faktur'         => $pathBukti,
             ]);
 
             DB::commit();
@@ -123,5 +130,11 @@ class PurchaseController extends Controller
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
+    }
+
+    public function receipt(Purchase $purchase)
+    {
+        $purchase->load(['product', 'supplier']);
+        return view('purchases.receipt', compact('purchase'));
     }
 }

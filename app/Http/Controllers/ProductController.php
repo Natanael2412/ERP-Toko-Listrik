@@ -70,6 +70,27 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        if (empty($request->sku) && $request->category_id) {
+            $category = Category::find($request->category_id);
+            if ($category) {
+                $prefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $category->nama_kategori), 0, 3));
+                if (strlen($prefix) < 3) {
+                    $prefix = str_pad($prefix, 3, 'X');
+                }
+                
+                $lastProduct = Product::where('sku', 'like', $prefix . '-%')
+                                      ->orderBy('sku', 'desc')->first();
+                                      
+                if ($lastProduct && preg_match('/-(\d+)$/', $lastProduct->sku, $matches)) {
+                    $nextNum = intval($matches[1]) + 1;
+                    $sku = $prefix . '-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+                } else {
+                    $sku = $prefix . '-0001';
+                }
+                $request->merge(['sku' => $sku]);
+            }
+        }
+
         $request->validate([
             'category_id'  => 'required|exists:categories,id',
             'sku'          => 'required|string|max:50|unique:products,sku',

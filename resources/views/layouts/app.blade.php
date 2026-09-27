@@ -14,7 +14,7 @@
     <div class="flex h-screen overflow-hidden">
 
         {{-- Sidebar --}}
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 transform bg-sidebar text-white transition-transform duration-200 ease-in-out lg:relative lg:translate-x-0 -translate-x-full">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 transform bg-sidebar text-white transition-transform duration-200 ease-in-out lg:relative lg:translate-x-0 -translate-x-full print:hidden">
             {{-- Logo / Nama Toko --}}
             <div class="flex h-16 items-center gap-3 border-b border-white/10 px-6">
                 <img src="{{ asset('images/logo-icon.webp') }}" alt="Adit Kejut Logo" class="h-9 w-9 rounded-lg object-contain bg-white/10 p-1">
@@ -148,7 +148,7 @@
         {{-- Main Content --}}
         <div class="flex flex-1 flex-col overflow-hidden">
             {{-- Top Bar --}}
-            <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 lg:px-6">
+            <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 lg:px-6 print:hidden">
                 {{-- Tombol Hamburger (Mobile) --}}
                 <button id="sidebar-toggle" class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>

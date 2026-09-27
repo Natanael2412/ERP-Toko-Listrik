@@ -15,8 +15,6 @@ use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | Routes - Adit Kejut POS
-|--------------------------------------------------------------------------
-*/
 
 // === Guest (belum login) ===
 Route::middleware('guest')->group(function () {
@@ -61,6 +59,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
         Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::get('/purchases/receipt/{purchase}', [PurchaseController::class, 'receipt'])->name('purchases.receipt');
 
         // Retur Penjualan
         Route::get('/returns', [ReturnController::class, 'index'])->name('returns.index');

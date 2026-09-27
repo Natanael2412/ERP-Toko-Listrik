@@ -69,6 +69,7 @@
                     <th class="px-4 py-3 font-semibold text-gray-600">Waktu</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">No. Nota</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Kasir</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Pembayaran</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Item</th>
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">Penjualan</th>
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">HPP</th>
@@ -80,8 +81,13 @@
                 @php $laba = $trx->total_penjualan - $trx->total_hpp; @endphp
                 <tr class="transition hover:bg-gray-50">
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $trx->tanggal_waktu->format('d/m/Y H:i') }}</td>
-                    <td class="px-4 py-3 font-mono text-xs font-semibold text-primary-600">{{ $trx->nomor_nota }}</td>
+                    <td class="px-4 py-3 font-mono text-xs font-semibold">
+                        <a href="{{ route('pos.receipt', $trx) }}" class="text-primary-600 hover:text-primary-800 hover:underline transition">
+                            {{ $trx->nomor_nota }}
+                        </a>
+                    </td>
                     <td class="px-4 py-3 text-gray-600">{{ $trx->user->username ?? '-' }}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-gray-600">{{ strtoupper($trx->metode_pembayaran ?? 'CASH') }}</td>
                     <td class="px-4 py-3 text-gray-600 text-xs">
                         @foreach($trx->details as $d)
                             {{ $d->product->nama_barang }} ({{ $d->qty }}x)<br>

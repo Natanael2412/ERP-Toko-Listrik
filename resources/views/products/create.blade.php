@@ -16,8 +16,8 @@
             @csrf
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                    <label for="sku" class="mb-1.5 block text-sm font-medium text-gray-700">Kode SKU</label>
-                    <input type="text" id="sku" name="sku" value="{{ old('sku') }}" required placeholder="Contoh: KBL-NYM-2.5"
+                    <label for="sku" class="mb-1.5 block text-sm font-medium text-gray-700">Kode SKU <span class="text-xs text-gray-500 font-normal">(Opsional - Dibuat otomatis jika kosong)</span></label>
+                    <input type="text" id="sku" name="sku" value="{{ old('sku') }}" placeholder="Contoh: KBL-NYM-2.5 atau biarkan kosong"
                         class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 @error('sku') border-red-400 @enderror">
                     @error('sku') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>

@@ -48,6 +48,7 @@
                 <tr>
                     <th class="px-4 py-3 font-semibold text-gray-600">Nomor Nota</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Tanggal</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Pembayaran</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Kasir</th>
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">Subtotal</th>
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">Diskon</th>
@@ -58,8 +59,13 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($transactions as $trx)
                 <tr class="transition hover:bg-gray-50">
-                    <td class="px-4 py-3 font-mono text-xs font-semibold text-primary-600">{{ $trx->nomor_nota }}</td>
+                    <td class="px-4 py-3 font-mono text-xs font-semibold">
+                        <a href="{{ route('pos.receipt', $trx) }}" class="text-primary-600 hover:text-primary-800 hover:underline transition">
+                            {{ $trx->nomor_nota }}
+                        </a>
+                    </td>
                     <td class="px-4 py-3 text-gray-600">{{ $trx->tanggal_waktu->format('d/m/Y H:i') }}</td>
+                    <td class="px-4 py-3 text-xs font-bold text-gray-600">{{ strtoupper($trx->metode_pembayaran ?? 'CASH') }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $trx->user->username }}</td>
                     <td class="px-4 py-3 text-right text-gray-600">Rp {{ number_format($trx->subtotal, 0, ',', '.') }}</td>
                     <td class="px-4 py-3 text-right {{ $trx->diskon > 0 ? 'text-red-500' : 'text-gray-400' }}">

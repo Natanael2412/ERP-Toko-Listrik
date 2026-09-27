@@ -9,7 +9,7 @@ class Purchase extends Model
     protected $fillable = [
         'user_id', 'product_id', 'supplier_id', 'nomor_faktur', 'nama_supplier',
         'qty_masuk', 'harga_beli', 'total_beli', 'tanggal_masuk',
-        'tanggal_jatuh_tempo', 'status_bayar', 'sisa_hutang',
+        'tanggal_jatuh_tempo', 'status_bayar', 'sisa_hutang', 'bukti_faktur',
     ];
 
     protected function casts(): array
