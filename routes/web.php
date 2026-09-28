@@ -15,6 +15,7 @@ use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | Routes - Adit Kejut POS
+*/
 
 // === Guest (belum login) ===
 Route::middleware('guest')->group(function () {
@@ -92,3 +93,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/audit-log', [ReportController::class, 'auditLog'])->name('reports.audit-log');
     });
 });
+Route::get('/run-migrations', function () { Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]); return 'Migrations run successfully.'; });

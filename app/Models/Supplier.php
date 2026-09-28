@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
 {
+    use \App\Traits\Auditable;
+
     protected $fillable = [
         'nama_supplier',
         'kontak',

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
+    use \App\Traits\Auditable;
+
     protected $fillable = [
         'user_id', 'product_id', 'supplier_id', 'nomor_faktur', 'nama_supplier',
         'qty_masuk', 'harga_beli', 'total_beli', 'tanggal_masuk',

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use \App\Traits\Auditable;
+
     protected $fillable = [
         'category_id', 'sku', 'nama_barang', 'satuan', 'stok', 'stok_minimum', 'hpp', 'harga_jual',
     ];

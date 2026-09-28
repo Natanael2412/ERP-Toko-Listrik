@@ -232,12 +232,12 @@ class ReportController extends Controller
      */
     public function auditLog(Request $request)
     {
-        $query = AuditLog::with('user')->orderByDesc('timestamp');
+        $query = AuditLog::with('user')->orderByDesc('created_at');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('aksi', 'like', "%{$search}%")
-                  ->orWhere('detail_perubahan', 'like', "%{$search}%")
+                $q->where('event', 'like', "%{$search}%")
+                  ->orWhere('auditable_type', 'like', "%{$search}%")
                   ->orWhereHas('user', fn($u) => $u->where('username', 'like', "%{$search}%"));
             });
         }

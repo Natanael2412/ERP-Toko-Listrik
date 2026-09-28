@@ -6,11 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
 {
-    // Nonaktifkan default timestamps Laravel
-    public $timestamps = false; 
-
     protected $fillable = [
-        'user_id', 'aksi', 'detail_perubahan', 'timestamp'
+        'user_id', 
+        'event', 
+        'auditable_type', 
+        'auditable_id', 
+        'old_values', 
+        'new_values', 
+        'ip_address'
+    ];
+
+    protected $casts = [
+        'old_values' => 'array',
+        'new_values' => 'array',
     ];
 
     public function user()

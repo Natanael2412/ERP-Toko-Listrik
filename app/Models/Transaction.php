@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
+    use \App\Traits\Auditable;
+
     protected $fillable = [
         'user_id', 'nomor_nota', 'tanggal_waktu', 'total_hpp',
         'subtotal', 'diskon', 'total_penjualan',
