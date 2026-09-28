@@ -137,4 +137,62 @@ class PurchaseController extends Controller
         $purchase->load(['product', 'supplier']);
         return view('purchases.receipt', compact('purchase'));
     }
+
+    public function edit(Purchase $purchase)
+    {
+        $products = Product::orderBy('nama_barang')->get();
+        $suppliers = \App\Models\Supplier::orderBy('nama_supplier')->get();
+        return view('purchases.edit', compact('purchase', 'products', 'suppliers'));
+    }
+
+    public function update(Request $request, Purchase $purchase)
+    {
+        $request->validate([
+            'nomor_faktur'        => 'required|string|max:50',
+            'supplier_id'         => 'required|exists:suppliers,id',
+            'tanggal_masuk'       => 'required|date',
+            'tanggal_jatuh_tempo' => 'required|date|after_or_equal:tanggal_masuk',
+            'status_bayar'        => 'required|in:lunas,belum_lunas',
+            'bukti_faktur'        => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $pathBukti = $purchase->bukti_faktur;
+        if ($request->hasFile('bukti_faktur')) {
+            $pathBukti = $request->file('bukti_faktur')->store('faktur', 'public');
+        }
+
+        $supplier = \App\Models\Supplier::findOrFail($request->supplier_id);
+
+        $purchase->update([
+            'nomor_faktur'        => $request->nomor_faktur,
+            'supplier_id'         => $request->supplier_id,
+            'nama_supplier'       => $supplier->nama_supplier,
+            'tanggal_masuk'       => $request->tanggal_masuk,
+            'tanggal_jatuh_tempo' => $request->tanggal_jatuh_tempo,
+            'status_bayar'        => $request->status_bayar,
+            'bukti_faktur'        => $pathBukti,
+        ]);
+
+        return redirect()->route('purchases.index')->with('success', 'Faktur pembelian berhasil diupdate (Note: Qty dan Harga Beli dikunci, harap void/hapus jika salah).');
+    }
+
+    public function destroy(Purchase $purchase)
+    {
+        DB::beginTransaction();
+        try {
+            $product = Product::lockForUpdate()->find($purchase->product_id);
+            if ($product) {
+                // Kembalikan stok
+                $product->decrement('stok', $purchase->qty_masuk);
+            }
+            
+            $purchase->delete();
+            DB::commit();
+
+            return back()->with('success', 'Faktur berhasil dihapus/void dan stok telah disesuaikan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menghapus faktur: ' . $e->getMessage());
+        }
+    }
 }

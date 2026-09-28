@@ -58,21 +58,26 @@
                     </td>
                     <td class="px-4 py-3 text-xs text-gray-500 max-w-md">
                         @if($log->auditable_type === 'Custom')
-                            {{ $log->new_values['description'] ?? '' }}
+                            {{ is_array($log->new_values) ? ($log->new_values['description'] ?? '') : $log->new_values }}
                         @else
-                            @if($log->old_values)
+                            @if($log->old_values && is_array($log->old_values))
                                 <div class="mb-1"><span class="font-semibold text-red-500">Lama:</span> 
                                     @foreach($log->old_values as $k => $v)
-                                        <span class="inline-block bg-gray-100 rounded px-1">{{ $k }}: {{ is_array($v) ? json_encode($v) : $v }}</span>
+                                        <span class="inline-block bg-gray-100 rounded px-1">{{ $k }}: {{ is_array($v) || is_object($v) ? json_encode($v) : $v }}</span>
                                     @endforeach
                                 </div>
+                            @elseif($log->old_values)
+                                <div class="mb-1"><span class="font-semibold text-red-500">Lama:</span> {{ $log->old_values }}</div>
                             @endif
-                            @if($log->new_values)
+
+                            @if($log->new_values && is_array($log->new_values))
                                 <div><span class="font-semibold text-green-500">Baru:</span> 
                                     @foreach($log->new_values as $k => $v)
-                                        <span class="inline-block bg-gray-100 rounded px-1">{{ $k }}: {{ is_array($v) ? json_encode($v) : $v }}</span>
+                                        <span class="inline-block bg-gray-100 rounded px-1">{{ $k }}: {{ is_array($v) || is_object($v) ? json_encode($v) : $v }}</span>
                                     @endforeach
                                 </div>
+                            @elseif($log->new_values)
+                                <div><span class="font-semibold text-green-500">Baru:</span> {{ $log->new_values }}</div>
                             @endif
                         @endif
                     </td>

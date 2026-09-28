@@ -41,4 +41,14 @@ class Product extends Model
     {
         return $this->stok <= $this->stok_minimum;
     }
+
+    /**
+     * Generate SKU unik
+     */
+    public static function generateSKU($categoryId)
+    {
+        $prefix = 'SKU-' . str_pad($categoryId, 2, '0', STR_PAD_LEFT);
+        $random = strtoupper(\Illuminate\Support\Str::random(6));
+        return $prefix . '-' . $random;
+    }
 }

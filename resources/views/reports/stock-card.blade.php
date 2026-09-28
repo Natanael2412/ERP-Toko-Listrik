@@ -155,6 +155,29 @@
             </div>
         </div>
     </div>
+
+    {{-- Grid Semua Produk --}}
+    <div class="mt-8">
+        <h2 class="mb-4 text-lg font-bold text-gray-800">Semua Produk & Stok Tersedia</h2>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            @foreach($products as $p)
+            <a href="{{ route('reports.stock-card', ['product_id' => $p->id]) }}" class="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-primary-300 hover:shadow-md">
+                <div class="flex flex-1 flex-col p-4">
+                    <p class="text-xs text-gray-400 mb-1">{{ $p->category->nama_kategori ?? 'Umum' }}</p>
+                    <h3 class="mb-2 text-sm font-bold text-gray-800 group-hover:text-primary-600 line-clamp-2">{{ $p->nama_barang }}</h3>
+                    <div class="mt-auto">
+                        <p class="text-xs font-semibold {{ $p->stok <= 0 ? 'text-red-500' : ($p->stok <= $p->stok_minimum ? 'text-orange-500' : 'text-green-600') }}">
+                            Stok: {{ $p->stok }} {{ $p->satuan }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+        <div class="mt-6">
+            {{ $products->links('pagination::tailwind') }}
+        </div>
+    </div>
     @endif
 </div>
 @endsection

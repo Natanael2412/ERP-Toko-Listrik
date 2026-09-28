@@ -60,7 +60,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
         Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
+        Route::put('/purchases/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
+        Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
         Route::get('/purchases/receipt/{purchase}', [PurchaseController::class, 'receipt'])->name('purchases.receipt');
+        
+        // Void Transaksi POS
+        Route::post('/pos/void/{transaction}', [PosController::class, 'voidTransaction'])->name('pos.void');
 
         // Retur Penjualan
         Route::get('/returns', [ReturnController::class, 'index'])->name('returns.index');
@@ -86,8 +92,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/debts/{purchase}/pay', [DebtController::class, 'pay'])->name('debts.pay');
 
         // Keuangan Laporan
-        Route::get('/reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
-        Route::get('/reports/balance-sheet', [ReportController::class, 'balanceSheet'])->name('reports.balance-sheet');
+        Route::get('/reports/financial-statement', [ReportController::class, 'financialStatement'])->name('reports.financial-statement');
 
         // Audit Log
         Route::get('/reports/audit-log', [ReportController::class, 'auditLog'])->name('reports.audit-log');

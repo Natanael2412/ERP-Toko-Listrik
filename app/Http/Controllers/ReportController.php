@@ -68,7 +68,7 @@ class ReportController extends Controller
      */
     public function stockCard(Request $request)
     {
-        $products = Product::orderBy('nama_barang')->get();
+        $products = Product::orderBy('nama_barang')->paginate(15)->withQueryString();
         $selectedProduct = null;
         $mutations = collect();
         $overview = [];
@@ -150,80 +150,78 @@ class ReportController extends Controller
     }
 
     /**
-     * Laporan Laba Rugi sederhana.
+     * Laporan Keuangan (Financial Statement) - Menggabungkan Neraca & Laba Rugi.
      */
-    public function profitLoss(Request $request)
+    public function financialStatement(Request $request)
     {
+        // Filter bisa berdasarkan bulan spesifik atau "Tahun Ini" / "Semua Waktu"
+        $filter = $request->input('filter', 'bulan'); // bulan, tahun, semua
         $bulan = $request->input('bulan', date('Y-m'));
-        [$tahun, $bln] = explode('-', $bulan);
+        $tahun_filter = $request->input('tahun', date('Y'));
 
-        // Pendapatan
-        $pendapatanPenjualan = Transaction::whereMonth('tanggal_waktu', $bln)
-            ->whereYear('tanggal_waktu', $tahun)
-            ->sum('total_penjualan');
+        // === LABA RUGI (PROFIT & LOSS) ===
+        // Filter Laba Rugi (rentang waktu)
+        $qPenjualan = Transaction::where('status', 'sukses');
+        $qHpp = Transaction::where('status', 'sukses');
+        $qRetur = ReturnItem::query();
 
-        // HPP (Harga Pokok Penjualan)
-        $hpp = Transaction::whereMonth('tanggal_waktu', $bln)
-            ->whereYear('tanggal_waktu', $tahun)
-            ->sum('total_hpp');
+        if ($filter === 'bulan') {
+            [$tahun, $bln] = explode('-', $bulan);
+            $qPenjualan->whereMonth('tanggal_waktu', $bln)->whereYear('tanggal_waktu', $tahun);
+            $qHpp->whereMonth('tanggal_waktu', $bln)->whereYear('tanggal_waktu', $tahun);
+            $qRetur->whereMonth('created_at', $bln)->whereYear('created_at', $tahun);
+            $tanggalNeraca = date('Y-m-t', strtotime($bulan . '-01')); // Akhir bulan
+        } elseif ($filter === 'tahun') {
+            $qPenjualan->whereYear('tanggal_waktu', $tahun_filter);
+            $qHpp->whereYear('tanggal_waktu', $tahun_filter);
+            $qRetur->whereYear('created_at', $tahun_filter);
+            $tanggalNeraca = date('Y-12-31', strtotime($tahun_filter . '-01-01'));
+        } else {
+            // Semua Waktu
+            $tanggalNeraca = date('Y-m-d'); // Hari ini
+        }
 
-        // Retur (pengurang pendapatan)
-        $totalRetur = ReturnItem::whereMonth('created_at', $bln)
-            ->whereYear('created_at', $tahun)
-            ->sum('jumlah_refund');
-
-        // Laba Kotor
+        $pendapatanPenjualan = $qPenjualan->sum('total_penjualan');
+        $hpp = $qHpp->sum('total_hpp');
+        $totalRetur = $qRetur->sum('jumlah_refund');
         $labaKotor = $pendapatanPenjualan - $hpp - $totalRetur;
 
-        // Data tambahan untuk detail
-        $jumlahTransaksi = Transaction::whereMonth('tanggal_waktu', $bln)
-            ->whereYear('tanggal_waktu', $tahun)
-            ->count();
-
-        $jumlahRetur = ReturnItem::whereMonth('created_at', $bln)
-            ->whereYear('created_at', $tahun)
-            ->count();
-
-        return view('reports.profit-loss', compact(
-            'bulan', 'pendapatanPenjualan', 'hpp', 'totalRetur',
-            'labaKotor', 'jumlahTransaksi', 'jumlahRetur'
-        ));
-    }
-
-    /**
-     * Laporan Neraca (Balance Sheet) sederhana.
-     */
-    public function balanceSheet(Request $request)
-    {
-        $tanggal = $request->input('tanggal', date('Y-m-d'));
+        // === NERACA (BALANCE SHEET) ===
+        // Neraca adalah snapshot per $tanggalNeraca (end of period)
 
         // Aset Lancar
-        // Persediaan (Total HPP barang yang masih ada di stok)
+        // Persediaan (Total HPP barang yang masih ada di stok saat ini)
+        // Note: Untuk sistem sederhana, kita ambil stok saat ini x HPP berjalan
         $persediaan = Product::all()->sum(function($product) {
-            // Asumsi nilai persediaan = stok * harga beli terakhir (atau average, disederhanakan)
-            $lastPurchase = Purchase::where('product_id', $product->id)->orderByDesc('tanggal_masuk')->first();
-            $hargaModal = $lastPurchase ? $lastPurchase->harga_beli : 0;
-            return $product->stok * $hargaModal;
+            return $product->stok * $product->hpp;
         });
 
-        // Kas (Total Penjualan - Total Pembelian yang Lunas)
-        $totalPenjualan = Transaction::whereDate('tanggal_waktu', '<=', $tanggal)->sum('total_penjualan');
-        $totalPembelianLunas = Purchase::whereDate('tanggal_masuk', '<=', $tanggal)->where('status_bayar', 'lunas')->sum('total_harga');
-        // Hutang yang sudah dibayar (Purchase lunas, atau sebagian)
-        // Disederhanakan: Kas masuk dari penjualan, kas keluar dari pembelian lunas + pembayaran cicilan utang
-        // Untuk sistem POS sederhana, kas = penjualan bersih
-        $kas = $totalPenjualan - $totalPembelianLunas; // Sederhana
+        // Asumsi Modal Awal (Starting Capital) uang tunai yang disetor owner sebelum bisnis jalan
+        $modalAwal = 1500000000;
 
+        $totalPenjualanAll = Transaction::where('status', 'sukses')
+            ->whereDate('tanggal_waktu', '<=', $tanggalNeraca)
+            ->sum('total_penjualan');
+        
+        $totalPembelianDibayar = Purchase::whereDate('tanggal_masuk', '<=', $tanggalNeraca)
+            ->sum(DB::raw('total_beli - sisa_hutang')); // Sederhana: asumsikan selisih adalah yang sudah dibayar
+
+        $totalReturAll = ReturnItem::whereDate('created_at', '<=', $tanggalNeraca)->sum('jumlah_refund');
+
+        $kas = $modalAwal + $totalPenjualanAll - $totalPembelianDibayar - $totalReturAll; 
+        
         $totalAset = $kas + $persediaan;
 
-        // Kewajiban (Hutang Usaha yang belum lunas)
-        $hutangUsaha = Purchase::whereDate('tanggal_masuk', '<=', $tanggal)->sum('sisa_hutang');
+        // Kewajiban (Hutang Usaha yang belum lunas per tanggal tersebut)
+        $hutangUsaha = Purchase::whereDate('tanggal_masuk', '<=', $tanggalNeraca)->sum('sisa_hutang');
 
         // Modal (Ekuitas) = Total Aset - Kewajiban
         $modal = $totalAset - $hutangUsaha;
 
-        return view('reports.balance-sheet', compact(
-            'tanggal', 'persediaan', 'kas', 'totalAset', 'hutangUsaha', 'modal'
+        return view('reports.financial-statement', compact(
+            'filter', 'bulan', 'tahun_filter', 'tanggalNeraca',
+            'pendapatanPenjualan', 'hpp', 'totalRetur', 'labaKotor',
+            'kas', 'persediaan', 'totalAset', 'hutangUsaha', 'modal'
         ));
     }
 

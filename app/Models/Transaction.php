@@ -10,7 +10,8 @@ class Transaction extends Model
 
     protected $fillable = [
         'user_id', 'nomor_nota', 'tanggal_waktu', 'total_hpp',
-        'subtotal', 'diskon', 'total_penjualan',
+        'subtotal', 'diskon', 'total_penjualan', 'metode_pembayaran',
+        'tipe_diskon', 'status'
     ];
 
     protected function casts(): array

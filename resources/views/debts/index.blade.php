@@ -71,15 +71,7 @@
                     <p class="text-xs text-gray-500 mt-1">{{ $ds->jumlah_faktur }} Faktur Belum Lunas</p>
                     <p class="text-lg font-bold text-red-600 mt-2">Rp {{ number_format($ds->total_hutang, 0, ',', '.') }}</p>
                 </div>
-                <form action="{{ route('debts.paySupplier') }}" method="POST" class="mt-4 border-t border-gray-100 pt-3">
-                    @csrf
-                    <input type="hidden" name="nama_supplier" value="{{ $ds->nama_supplier }}">
-                    <input type="hidden" name="tanggal_bayar" value="{{ date('Y-m-d') }}">
-                    <button type="submit" onclick="return confirm('Lunasi semua utang (Rp {{ number_format($ds->total_hutang, 0, ',', '.') }}) ke {{ $ds->nama_supplier }}?')" 
-                        class="w-full rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white shadow transition hover:bg-primary-700">
-                        Lunasi Semua
-                    </button>
-                </form>
+
             </div>
             @endforeach
         </div>
@@ -129,10 +121,21 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <a href="{{ route('debts.show', $debt) }}" class="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-700">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                            Detail
-                        </a>
+                        <div class="flex items-center justify-center gap-1">
+                            @if($debt->status_bayar !== 'lunas')
+                                <form action="{{ route('debts.pay', $debt) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="jumlah_bayar" value="{{ $debt->sisa_hutang }}">
+                                    <input type="hidden" name="tanggal_bayar" value="{{ date('Y-m-d') }}">
+                                    <button type="submit" onclick="return confirm('Lunasi utang ini secara penuh (Rp {{ number_format($debt->sisa_hutang, 0, ',', '.') }})?')" class="inline-flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">
+                                        Bayar
+                                    </button>
+                                </form>
+                            @endif
+                            <a href="{{ route('debts.show', $debt) }}" class="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-700">
+                                Detail
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty

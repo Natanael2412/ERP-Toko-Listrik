@@ -2,7 +2,7 @@
 @section('title', 'Detail Transaksi - ' . $transaction->nomor_nota)
 
 @section('content')
-<div class="max-w-3xl mx-auto pb-12">
+<div class="max-w-5xl mx-auto pb-12 px-4 sm:px-6 lg:px-8 pt-6">
     {{-- Tombol Aksi (Hanya Tampil di Layar) --}}
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4 print:hidden">
         <a href="{{ route('pos.history') }}" class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition">
@@ -16,60 +16,64 @@
     </div>
 
     {{-- Kertas Invoice --}}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm print:rounded-none print:border-none print:shadow-none">
-        <div class="p-8 sm:p-12">
+    <div class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl shadow-gray-200/40 print:rounded-none print:border-none print:shadow-none">
+        <div class="p-10 sm:p-16 lg:p-24">
             
             {{-- Header Invoice --}}
-            <div class="flex flex-col-reverse justify-between gap-6 sm:flex-row sm:items-start">
+            <div class="flex flex-col-reverse justify-between gap-12 sm:flex-row sm:items-start">
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">ADIT KEJUT</h1>
-                    <p class="mt-2 text-sm text-gray-500 max-w-xs">Jl. Contoh Toko Listrik No. 123<br>Kota Anda, Provinsi Anda 12345<br>Telp: 0812-3456-7890</p>
+                    <h1 class="text-4xl font-black text-gray-900 tracking-tighter">ADIT KEJUT</h1>
+                    <p class="mt-4 text-sm leading-loose text-gray-500 max-w-sm">
+                        Jl. Contoh Toko Listrik No. 123<br>
+                        Kota Anda, Provinsi Anda 12345<br>
+                        Telp: 0812-3456-7890
+                    </p>
                 </div>
                 <div class="text-left sm:text-right">
-                    <h2 class="text-2xl font-bold uppercase tracking-widest text-primary-600">INVOICE</h2>
-                    <p class="mt-1 font-mono text-sm font-medium text-gray-800">{{ $transaction->nomor_nota }}</p>
-                    <p class="mt-1 text-sm text-gray-500">{{ $transaction->tanggal_waktu->format('d/m/Y H:i') }}</p>
-                    <span class="mt-3 inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                        {{ strtoupper($transaction->metode_pembayaran ?? 'CASH') }}
+                    <h2 class="text-3xl font-black uppercase tracking-widest text-primary-600">INVOICE</h2>
+                    <p class="mt-4 font-mono text-base font-medium text-gray-800">{{ $transaction->nomor_nota }}</p>
+                    <p class="mt-2 text-sm text-gray-500">{{ $transaction->tanggal_waktu->format('d/m/Y H:i') }}</p>
+                    <span class="mt-4 inline-flex items-center rounded-full bg-green-50 px-4 py-1.5 text-xs font-bold tracking-widest text-green-700 uppercase">
+                        {{ $transaction->metode_pembayaran ?? 'CASH' }}
                     </span>
                 </div>
             </div>
 
-            <hr class="my-8 border-gray-200 border-dashed">
+            <hr class="my-16 border-gray-100 border-dashed">
 
             {{-- Info Kasir & Pembeli --}}
-            <div class="flex flex-col gap-6 sm:flex-row sm:justify-between">
+            <div class="flex flex-col gap-10 sm:flex-row sm:justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Kasir Bertugas</p>
-                    <p class="mt-1 font-medium text-gray-800">{{ $transaction->user->username }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Kasir Bertugas</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $transaction->user->username }}</p>
                 </div>
                 <div class="sm:text-right">
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Pelanggan</p>
-                    <p class="mt-1 font-medium text-gray-800">Pelanggan Umum</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Pelanggan</p>
+                    <p class="text-lg font-semibold text-gray-900">Pelanggan Umum</p>
                 </div>
             </div>
 
             {{-- Tabel Item --}}
-            <div class="mt-10 overflow-x-auto">
-                <table class="w-full text-left text-sm">
+            <div class="mt-20 overflow-x-auto">
+                <table class="w-full text-left">
                     <thead>
-                        <tr class="border-b border-gray-800 text-gray-800">
-                            <th class="py-3 font-semibold">Deskripsi Produk</th>
-                            <th class="py-3 text-right font-semibold">Harga</th>
-                            <th class="py-3 text-right font-semibold">Qty</th>
-                            <th class="py-3 text-right font-semibold">Subtotal</th>
+                        <tr class="border-b-2 border-gray-900 text-gray-900">
+                            <th class="py-5 font-bold uppercase tracking-wider text-xs">Deskripsi Produk</th>
+                            <th class="py-5 text-right font-bold uppercase tracking-wider text-xs">Harga</th>
+                            <th class="py-5 text-right font-bold uppercase tracking-wider text-xs">Qty</th>
+                            <th class="py-5 text-right font-bold uppercase tracking-wider text-xs">Subtotal</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($transaction->details as $detail)
                         <tr>
-                            <td class="py-4">
-                                <p class="font-medium text-gray-900">{{ $detail->product->nama_barang }}</p>
+                            <td class="py-8">
+                                <p class="text-base font-semibold text-gray-900 mb-1">{{ $detail->product->nama_barang }}</p>
                                 <p class="font-mono text-xs text-gray-400">{{ $detail->product->sku }}</p>
                             </td>
-                            <td class="py-4 text-right text-gray-600">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
-                            <td class="py-4 text-right text-gray-600">{{ $detail->qty }} {{ $detail->product->satuan ?? 'pcs' }}</td>
-                            <td class="py-4 text-right font-medium text-gray-900">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                            <td class="py-8 text-right text-gray-600">Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+                            <td class="py-8 text-right text-gray-600">{{ $detail->qty }} {{ $detail->product->satuan ?? 'pcs' }}</td>
+                            <td class="py-8 text-right font-semibold text-gray-900">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -77,30 +81,30 @@
             </div>
 
             {{-- Ringkasan Total --}}
-            <div class="mt-8 flex justify-end">
-                <div class="w-full max-w-sm space-y-3 rounded-xl bg-gray-50 p-6 print:bg-transparent print:p-0">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Subtotal</span>
-                        <span class="font-medium text-gray-800">Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}</span>
+            <div class="mt-16 flex justify-end">
+                <div class="w-full max-w-md space-y-5 rounded-2xl bg-gray-50/50 p-10 print:bg-transparent print:p-0">
+                    <div class="flex justify-between text-base">
+                        <span class="text-gray-500 font-medium">Subtotal</span>
+                        <span class="font-semibold text-gray-900">Rp {{ number_format($transaction->subtotal ?: $transaction->total_penjualan, 0, ',', '.') }}</span>
                     </div>
                     @if($transaction->diskon > 0)
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Diskon</span>
-                        <span class="font-medium text-red-500">-Rp {{ number_format($transaction->diskon, 0, ',', '.') }}</span>
+                    <div class="flex justify-between text-base">
+                        <span class="text-gray-500 font-medium">Diskon</span>
+                        <span class="font-semibold text-red-500">-Rp {{ number_format($transaction->diskon, 0, ',', '.') }}</span>
                     </div>
                     @endif
-                    <div class="border-t border-gray-200 pt-3">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-800">TOTAL</span>
-                            <span class="text-2xl font-extrabold text-primary-600 print:text-gray-900">Rp {{ number_format($transaction->total_penjualan, 0, ',', '.') }}</span>
+                    <div class="border-t border-gray-200 pt-6 mt-6">
+                        <div class="flex justify-between items-end">
+                            <span class="font-black text-gray-900 tracking-wider">TOTAL</span>
+                            <span class="text-3xl font-black text-primary-600 print:text-gray-900">Rp {{ number_format($transaction->total_penjualan, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {{-- Footer Note --}}
-            <div class="mt-16 text-center text-sm text-gray-400 print:mt-12">
-                <p>Terima kasih atas kepercayaan Anda berbelanja di Adit Kejut.</p>
+            <div class="mt-32 text-center text-sm text-gray-400 print:mt-24 space-y-2">
+                <p class="font-medium">Terima kasih atas kepercayaan Anda berbelanja di Adit Kejut.</p>
                 <p>Barang yang sudah dibeli tidak dapat dikembalikan tanpa nota ini.</p>
             </div>
         </div>

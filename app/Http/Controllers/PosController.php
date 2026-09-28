@@ -165,6 +165,38 @@ class PosController extends Controller
     }
 
     /**
+     * Void transaksi (Hanya Admin & Owner).
+     */
+    public function voidTransaction(Transaction $transaction)
+    {
+        if ($transaction->status === 'void') {
+            return back()->with('error', 'Transaksi ini sudah di-void sebelumnya.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Ubah status
+            $transaction->update(['status' => 'void']);
+
+            // Kembalikan stok produk
+            foreach ($transaction->details as $detail) {
+                if ($detail->product) {
+                    $detail->product->increment('stok', $detail->qty);
+                }
+            }
+
+            DB::commit();
+
+            $this->catatAudit('Void Transaksi', "Void Nota: {$transaction->nomor_nota}, Total: Rp " . number_format($transaction->total_penjualan, 0, ',', '.'));
+
+            return back()->with('success', "Transaksi {$transaction->nomor_nota} berhasil di-void dan stok telah dikembalikan.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal mem-void transaksi: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Riwayat transaksi.
      */
     public function history(Request $request)
